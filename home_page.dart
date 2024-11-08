@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'wardrobe_page.dart';
+import 'trade_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -61,30 +62,38 @@ class HomePage extends StatelessWidget {
           ),
           // 오른쪽 섹션 - 중고거래
           Expanded(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1D1E33),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.swap_horiz,
-                    size: 100,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '중고거래',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TradePage()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1D1E33),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.swap_horiz,
+                      size: 100,
+                      color: Colors.white,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Text(
+                      '중고거래',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
