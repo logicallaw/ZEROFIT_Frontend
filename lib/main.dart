@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/onboarding_screen.dart';
+import 'package:provider/provider.dart';
+import 'store.dart';
 
-void main() {
+void main() async{
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -10,7 +14,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider(create: (c) => Store1(),
+      child :MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ZeroFit',
       theme: ThemeData(
@@ -23,6 +28,7 @@ class MyApp extends StatelessWidget {
           )
       ),
       home: const OnboardingScreen(),
+     )
     );
   }
 }

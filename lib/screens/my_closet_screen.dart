@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'account_management_screen.dart';
+import '../services/api_service.dart';
 
 class MyClosetScreen extends StatefulWidget {
   const MyClosetScreen({Key? key}) : super(key: key);
@@ -44,7 +46,14 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
         actions: [
           IconButton(
             icon: Icon(Icons.account_circle),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AccountManagementScreen(),
+                ),
+              );
+            },
             highlightColor: Colors.transparent,
           ),
         ],
@@ -167,6 +176,9 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                             userImage = File(image.path);
                           });
                         }
+                        if(userImage == null){
+                          return;
+                        }
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -210,6 +222,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
 
 Widget _buildItem(String imagePath, String title, String subtitle) {
   return Container(
+
     decoration: BoxDecoration(
       color: Color.fromRGBO(255, 182, 163, 0.3),
       borderRadius: BorderRadius.circular(16),
@@ -229,7 +242,7 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
           child: Image.asset(
             imagePath,
             fit: BoxFit.cover,
-            height: 120,
+            height: 150,
             width: double.infinity,
           ),
         ),
@@ -303,6 +316,21 @@ class _UploadState extends State<Upload> {
   bool isRatingEmpty = false;
   bool isClothingTypeEmpty = false;
   bool isClothingStyleEmpty = false;
+  final ApiService _apiService = ApiService();
+
+  Future<void> _uploadImage() async {
+    String uploadStat ='';
+
+    final response = await _apiService.uploadImage(image: widget.userImage!, clothesId: 123);
+
+    if(response != null){
+      uploadStat = 'success';
+    }
+    else {
+      uploadStat = 'fail';
+    }
+    print(uploadStat);
+  }
 
   void _validateAndSubmit() {
     setState(() {
@@ -319,7 +347,9 @@ class _UploadState extends State<Upload> {
       print("별 점수: $selectedRating");
       print("옷 종류: $selectedClothingType");
       print("옷 스타일: $selectedClothingStyle");
+
       Navigator.pop(context);
+      _uploadImage();
       // 여기서 등록 로직을 추가하세요
     }
   }

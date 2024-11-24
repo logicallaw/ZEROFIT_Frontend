@@ -1,10 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const int port = 10010;
-  final String base_url = 'http://localhost:$port'; // NodeJS Server
+  final String base_url = 'http://35.209.215.241:10103'; // NodeJS Server
+  late final nodeUrl;
 
+  ApiService() {
+    final nodeHost = dotenv.get("NODE_HOST");
+    final nodePort = dotenv.get("NODE_PORT");
+    nodeUrl = 'http://$nodeHost:$nodePort';
+  }
   // GET /my-image
   Future<String> fetchData() async {
     final response = await http.get(Uri.parse('$base_url/my-image'));
@@ -53,6 +60,47 @@ class ApiService {
       }
     } catch (e) {
       return 'Error: Could not connect to server';
+    }
+
+
+  }
+
+  Future<Map<String, dynamic>?> uploadImage({
+    required File image,
+    required int clothesId,
+  }) async {
+    try {
+      // 이미지를 Base64로 인코딩
+      String base64Image = base64Encode(await image.readAsBytesSync());
+      // JSON 데이터 생성
+      final body = jsonEncode({
+        'clothes_id': clothesId,
+        'image': base64Image,
+      });
+
+      // 요청 전송
+      final response = await http.post(
+        Uri.parse('$nodeUrl/clothes/upload_image'),
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body); // 성공 시 JSON 데이터 반환
+      } else {
+        // 실패한 경우 응답 로그
+        print("Failed to upload. Status code: ${response.statusCode}");
+        try {
+          final responseBody = jsonDecode(response.body);
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return null;
+      }
+    } catch (e) {
+      // 네트워크 오류 또는 기타 에러 처리
+      print("Error occurred while uploading: $e");
+      return null;
     }
   }
 }

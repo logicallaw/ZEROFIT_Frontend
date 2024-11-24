@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ma_app_zerofit/main.dart';
+import 'package:provider/provider.dart';
 import 'password_reset_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ma_app_zerofit/store.dart';
 
 class AccountManagementScreen extends StatefulWidget {
   const AccountManagementScreen({super.key});
@@ -10,13 +13,6 @@ class AccountManagementScreen extends StatefulWidget {
 }
 
 class _AccountManagementScreenState extends State<AccountManagementScreen> {
-  final _storage = FlutterSecureStorage();
-
-  Future<Map<String, String?>> _getUserInfo() async {
-    final email = await _storage.read(key: 'email');
-    final name = await _storage.read(key: 'name');
-    return {'email': email, 'name': name};
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +35,11 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
             child: Icon(Icons.person, size: 50, color: Colors.white),
           ),
           const SizedBox(height: 10),
-          const Text(
-            '김인하',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            '안녕',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const Text('inhajoa@gmail.com'),
+          Text(context.watch<Store1>().userEmail),
           const SizedBox(height: 20),
           const Divider(),
           ListTile(

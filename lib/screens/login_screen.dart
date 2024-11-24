@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 import 'find_password_screen.dart';
 import 'main_home_screen.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +9,7 @@ import 'dart:convert';
 import '../services/api_service.dart';
 import '../storage/user_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:ma_app_zerofit/store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _passwordCheckController = TextEditingController();
   String _responseMessage = '';
   final _storage = FlutterSecureStorage();
+  late final nodeUrl;
 
   Future<void> _signup() async {
     final email = _emailController.text.trim();
@@ -97,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<String> _sendLoginRequest(String email, String password) async {
-    final url = Uri.parse('http://localhost:10010/auth/login');
+    final url = Uri.parse('http://35.209.215.241:10103/auth/login');
     final headers = {'Content-Type': 'application/json'};
     final body = {'email': email, 'password': password};
 
@@ -106,13 +109,19 @@ class _LoginScreenState extends State<LoginScreen>
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
 
+        print(responseBody);
+
+
 
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MainHomeScreen(), // 이메일 전달
+            builder: (context) => MainHomeScreen(),
           ),
+
+
         );
+        context.read<Store1>().saveUserEmail(responseBody['user']['email']);
 
         return 'Login successful!';
       } else {
@@ -125,10 +134,16 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
+  Future<void> SaveUrl() async {
+    final nodeHost = dotenv.get("NODE_HOST");
+    final nodePort = dotenv.get("NODE_PORT");
+    nodeUrl = 'http://$nodeHost:$nodePort';
+  }
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    SaveUrl();
   }
 
   @override
@@ -204,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen>
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: 'Dosamarvis@gmail.com',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -216,6 +232,7 @@ class _LoginScreenState extends State<LoginScreen>
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: '••••••••',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -273,6 +290,7 @@ class _LoginScreenState extends State<LoginScreen>
                   controller: _nameController,
                   decoration: InputDecoration(
                     hintText: '신민희',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -284,6 +302,7 @@ class _LoginScreenState extends State<LoginScreen>
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: 'name@email.com',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -297,6 +316,7 @@ class _LoginScreenState extends State<LoginScreen>
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: '비밀번호를 입력해주세요.',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -309,6 +329,7 @@ class _LoginScreenState extends State<LoginScreen>
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: '비밀번호 확인',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -322,6 +343,7 @@ class _LoginScreenState extends State<LoginScreen>
                   controller: _addressController,
                   decoration: InputDecoration(
                     hintText: '의류 거래를 원하시는 주소를 입력해주세요.',
+                    hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
