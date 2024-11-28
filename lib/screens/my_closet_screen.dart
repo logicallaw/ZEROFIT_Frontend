@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'account_management_screen.dart';
 import '../services/api_service.dart';
+import 'image_masking.dart';
 
 class MyClosetScreen extends StatefulWidget {
   const MyClosetScreen({Key? key}) : super(key: key);
@@ -311,24 +312,38 @@ class _UploadState extends State<Upload> {
   String? selectedClothingStyle; // 선택된 옷 스타일
   int selectedRating = 0; // 선택된 별 개수 (만족도 수)
   final TextEditingController _clothingNameController = TextEditingController(); // 옷 이름 입력 컨트롤러
-
+  final TextEditingController _memoController = TextEditingController();
   bool isClothingNameEmpty = false;
   bool isRatingEmpty = false;
   bool isClothingTypeEmpty = false;
   bool isClothingStyleEmpty = false;
   final ApiService _apiService = ApiService();
+  late Offset _includePoint;
+  late Offset _excludePoint;
 
   Future<void> _uploadImage() async {
     String uploadStat ='';
 
-    final response = await _apiService.uploadImage(image: widget.userImage!, clothesId: 123);
-
-    if(response != null){
-      uploadStat = 'success';
-    }
-    else {
-      uploadStat = 'fail';
-    }
+    List<String> style = [selectedClothingStyle.toString()];
+    List<String> type = [selectedClothingType.toString()];
+    final response = await _apiService.uploadImage(
+      image: widget.userImage!,
+      clothingName: _clothingNameController.text,
+      rating: selectedRating,
+      clothingTypes: type,
+      clothingStyles: style,
+      memo: _memoController.text,
+      includePoint: _includePoint,
+      excludePoint: _excludePoint,
+    );
+   setState(() {
+     if(response != null){
+       uploadStat = 'success';
+     }
+     else {
+       uploadStat = 'fail';
+     }
+   });
     print(uploadStat);
   }
 
@@ -342,17 +357,41 @@ class _UploadState extends State<Upload> {
     });
 
     if (!isClothingNameEmpty && !isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty) {
+      if(_memoController.text.isEmpty) {
+        _memoController.text = "";
+      }
       // 모든 필드가 입력되었을 때 동작
       print("옷 이름: ${_clothingNameController.text}");
       print("별 점수: $selectedRating");
       print("옷 종류: $selectedClothingType");
       print("옷 스타일: $selectedClothingStyle");
 
-      Navigator.pop(context);
-      _uploadImage();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ImageMaskingScreen(
+            image: widget.userImage!,
+            onSubmit: ({required Offset includePoint, required Offset excludePoint}) {
+              setState(() {
+                _includePoint = includePoint;
+                _excludePoint = excludePoint;
+              });
+
+              print("Include Point: $_includePoint");
+              print("Exclude Point: $_excludePoint");
+              _uploadImage();
+              Navigator.pop(context);
+
+            },
+          ),
+        ),
+      );
+
+
       // 여기서 등록 로직을 추가하세요
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -480,6 +519,7 @@ class _UploadState extends State<Upload> {
               ),
               child: TextField(
                 maxLines: 3,
+                controller: _memoController,
                 decoration: InputDecoration(
                   hintText: '의류 관리법을 입력하세요.',
                   hintStyle: TextStyle(color: Colors.grey),

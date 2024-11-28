@@ -29,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _passwordCheckController = TextEditingController();
   String _responseMessage = '';
-  final _storage = FlutterSecureStorage();
   late final nodeUrl;
 
   Future<void> _signup() async {
@@ -59,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen>
       });
       return;
     }
-
 
     final result = await _apiService.signup(
       email: email,
@@ -91,59 +89,28 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     // Node.js 서버로 로그인 요청
-    final response = await _sendLoginRequest(email, password);
-
+    final response = await _apiService.sendLoginRequest(email, password);
 
     setState(() {
-      _responseMessage = response;
-    });
-  }
-
-  Future<String> _sendLoginRequest(String email, String password) async {
-    final url = Uri.parse('http://35.209.215.241:10103/auth/login');
-    final headers = {'Content-Type': 'application/json'};
-    final body = {'email': email, 'password': password};
-
-    try {
-      final response = await http.post(url, headers: headers, body: jsonEncode(body));
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-
-        print(responseBody);
-
-
-
+      if(response['status']) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => MainHomeScreen(),
           ),
-
-
         );
-        context.read<Store1>().saveUserEmail(responseBody['user']['email']);
-
-        return 'Login successful!';
-      } else {
-        final responseBody = jsonDecode(response.body);
-        return 'Error: ${responseBody['message']}';
       }
-    } catch (e) {
-
-      return 'Error: Could not connect to server';
-    }
+      context.read<Store1>().saveUserEmail('subEmail');
+      _responseMessage = response['message'];
+    });
   }
 
-  Future<void> SaveUrl() async {
-    final nodeHost = dotenv.get("NODE_HOST");
-    final nodePort = dotenv.get("NODE_PORT");
-    nodeUrl = 'http://$nodeHost:$nodePort';
-  }
+
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    SaveUrl();
   }
 
   @override
