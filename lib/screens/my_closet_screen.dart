@@ -308,8 +308,8 @@ class Upload extends StatefulWidget {
 }
 
 class _UploadState extends State<Upload> {
-  String? selectedClothingType; // 선택된 옷 종류
-  String? selectedClothingStyle; // 선택된 옷 스타일
+  List<String> selectedClothingType = []; // 선택된 옷 종류들
+  List<String> selectedClothingStyle = []; // 선택된 옷 스타일들
   int selectedRating = 0; // 선택된 별 개수 (만족도 수)
   final TextEditingController _clothingNameController = TextEditingController(); // 옷 이름 입력 컨트롤러
   final TextEditingController _memoController = TextEditingController();
@@ -324,14 +324,12 @@ class _UploadState extends State<Upload> {
   Future<void> _uploadImage() async {
     String uploadStat ='';
 
-    List<String> style = [selectedClothingStyle.toString()];
-    List<String> type = [selectedClothingType.toString()];
     final response = await _apiService.uploadImage(
       image: widget.userImage!,
       clothingName: _clothingNameController.text,
       rating: selectedRating,
-      clothingTypes: type,
-      clothingStyles: style,
+      clothingTypes: selectedClothingType,
+      clothingStyles: selectedClothingType,
       memo: _memoController.text,
       includePoint: _includePoint,
       excludePoint: _excludePoint,
@@ -352,8 +350,8 @@ class _UploadState extends State<Upload> {
       // 입력 값 확인 및 상태 업데이트
       isClothingNameEmpty = _clothingNameController.text.isEmpty;
       isRatingEmpty = selectedRating == 0;
-      isClothingTypeEmpty = selectedClothingType == null;
-      isClothingStyleEmpty = selectedClothingStyle == null;
+      isClothingTypeEmpty = selectedClothingType.isEmpty;
+      isClothingStyleEmpty = selectedClothingStyle.isEmpty;
     });
 
     if (!isClothingNameEmpty && !isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty) {
@@ -553,12 +551,16 @@ class _UploadState extends State<Upload> {
   }
 
   Widget _buildSelectableButton(String label, {required bool isStyle}) {
-    bool isSelected = isStyle ? selectedClothingStyle == label : selectedClothingType == label;
+    bool isSelected = isStyle
+        ? selectedClothingStyle.contains(label)
+        : selectedClothingType.contains(label);
 
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        backgroundColor: isSelected ? Color.fromRGBO(255, 182, 163, 1) : Color.fromRGBO(255, 182, 163, 0.5),
+        backgroundColor: isSelected
+            ? Color.fromRGBO(255, 182, 163, 1)
+            : Color.fromRGBO(255, 182, 163, 0.5),
         minimumSize: Size(60, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -567,9 +569,19 @@ class _UploadState extends State<Upload> {
       onPressed: () {
         setState(() {
           if (isStyle) {
-            selectedClothingStyle = selectedClothingStyle == label ? null : label;
+            // 선택 토글
+            if (selectedClothingStyle.contains(label)) {
+              selectedClothingStyle.remove(label);
+            } else {
+              selectedClothingStyle.add(label);
+            }
           } else {
-            selectedClothingType = selectedClothingType == label ? null : label;
+            // 선택 토글
+            if (selectedClothingType.contains(label)) {
+              selectedClothingType.remove(label);
+            } else {
+              selectedClothingType.add(label);
+            }
           }
         });
       },
