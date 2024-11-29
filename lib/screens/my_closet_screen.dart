@@ -329,7 +329,7 @@ class _UploadState extends State<Upload> {
       clothingName: _clothingNameController.text,
       rating: selectedRating,
       clothingTypes: selectedClothingType,
-      clothingStyles: selectedClothingType,
+      clothingStyles: selectedClothingStyle,
       memo: _memoController.text,
       includePoint: _includePoint,
       excludePoint: _excludePoint,
