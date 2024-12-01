@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'account_management_screen.dart';
 import '../services/api_service.dart';
 import 'image_masking.dart';
+import 'dart:typed_data';
+import 'dart:async';
+import 'ai_fitting.dart';
 
 class MyClosetScreen extends StatefulWidget {
   const MyClosetScreen({Key? key}) : super(key: key);
@@ -15,11 +19,25 @@ class MyClosetScreen extends StatefulWidget {
 class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   var userImage;
+  final ApiService _apiService = ApiService();
+
+  List<dynamic>? items;
+
+  getClothes() async{
+    var result = await _apiService.getClothesInfo();
+    if(result == null)
+      return;
+
+    setState(() {
+      items =  List<dynamic>.from(result);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    getClothes();
   }
 
   @override
@@ -96,17 +114,19 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: GridView.builder(
+                child: items == null ?  Text('No data available')
+                 : GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, // 두 줄씩 배치
                     crossAxisSpacing: 16.0, // 아이템 간 가로 간격
                     mainAxisSpacing: 16.0, // 아이템 간 세로 간격
                     childAspectRatio: 3 / 4, // 아이템의 가로세로 비율 조정
                   ),
-                  itemCount: items.length,
+                  itemCount: items!.length,
                   itemBuilder: (context, index) {
-                    final item = items[index];
-                    return _buildItem(item['image']!, item['title']!, item['subtitle']!);
+                    final item = items![index];
+                    final Uint8List imageBytes = base64Decode(item['base64_image']!);
+                    return _buildItem(imageBytes, item['clothes_name'].toString(), item['clothes_type'].toString());
                   },
                 ),
               ),
@@ -125,11 +145,15 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                       onPressed: () async {
                         var picker = ImagePicker();
                         var image = await picker.pickImage(source: ImageSource.gallery);
-                        if (image != null) {
-                          setState(() {
-                            userImage = File(image.path);
-                          });
-                        }
+                        if(image == null)
+                          return;
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AiFitting(personImage: File(image.path), items : items),
+                          ),
+                        );
                       },
                       icon: Icon(Icons.image),
                       color: Colors.white,
@@ -183,7 +207,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Upload(userImage: userImage),
+                            builder: (context) => Upload(userImage: userImage, getClothes: getClothes),
                           ),
                         );
                       },
@@ -221,7 +245,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
   }
 }
 
-Widget _buildItem(String imagePath, String title, String subtitle) {
+Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
   return Container(
 
     decoration: BoxDecoration(
@@ -240,8 +264,8 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          child: Image.asset(
-            imagePath,
+          child: Image.memory(
+            imageBytes,
             fit: BoxFit.cover,
             height: 150,
             width: double.infinity,
@@ -266,48 +290,19 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
   );
 }
 
-final List<Map<String, String>> items = [
-  {
-    'image': 'assets/clot.png',
-    'title': '가을 맞이 니트',
-    'subtitle': '#상의 #캐주얼',
-  },
-  {
-    'image': 'assets/clot.png',
-    'title': '무난무난한 운동화',
-    'subtitle': '#신발 #스포츠',
-  },
-  {
-    'image': 'assets/clot.png',
-    'title': '도넛 목걸이',
-    'subtitle': '#악세사리 #포인트',
-  },
-  {
-    'image': 'assets/clot.png',
-    'title': '부츠컷 청바지',
-    'subtitle': '#바지 #캐주얼',
-  },
-  {
-    'image': 'assets/clot.png',
-    'title': '가을아 가자마 코트',
-    'subtitle': '#아우터 #포멀',
-  },
-  {
-    'image': 'assets/clot.png',
-    'title': '기본 맨투맨',
-    'subtitle': '#상의 #캐주얼',
-  },
-];
+
 
 class Upload extends StatefulWidget {
-  const Upload({super.key, this.userImage});
+  const Upload({super.key, this.userImage, this.getClothes});
   final File? userImage;
+  final getClothes;
 
   @override
   _UploadState createState() => _UploadState();
 }
 
 class _UploadState extends State<Upload> {
+
   List<String> selectedClothingType = []; // 선택된 옷 종류들
   List<String> selectedClothingStyle = []; // 선택된 옷 스타일들
   int selectedRating = 0; // 선택된 별 개수 (만족도 수)
@@ -378,6 +373,7 @@ class _UploadState extends State<Upload> {
               print("Include Point: $_includePoint");
               print("Exclude Point: $_excludePoint");
               _uploadImage();
+              widget.getClothes(); // 여기 에러 가능 주의
               Navigator.pop(context);
 
             },

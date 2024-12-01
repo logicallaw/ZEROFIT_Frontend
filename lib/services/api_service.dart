@@ -69,7 +69,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> sendLoginRequest(String email, String password) async {
-    final url = Uri.parse('http://35.209.215.241:10103/auth/login');
+    final url = Uri.parse('$nodeUrl/auth/login');
     final headers = {'Content-Type': 'application/json'};
     final body = {'email': email, 'password': password};
 
@@ -173,6 +173,90 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>?> getClothesInfo() async {
+   try{
+     final token = await _storage.read(key: 'jwt_token');
+
+     if (token == null) {
+       throw Exception('User not authenticated');
+     }
+
+     final userId = await _getUserIdFromJwt(token);
+
+     final headers = {
+       'Content-Type': 'application/json',
+       'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+     };
+
+     final body = jsonEncode({
+       'userId' : userId,
+     });
+     final response = await http.post(
+       Uri.parse('$nodeUrl/clothes/info'),
+       headers: headers,
+       body: body,
+     );
+     final responseBody = jsonDecode(response.body);
+     if(response.statusCode == 200) {
+       print(responseBody["clothes"].runtimeType);
+       return responseBody["clothes"];
+     } else {
+       try {
+         print("Error message: ${responseBody['message']}");
+       } catch (e) {
+         print("Error decoding response: $e");
+       }
+       return null;
+     }
+   }catch (e) {
+     return null;
+   }
+  }
+
+  Future<String> getAiFitting({
+    required File personImage,
+    required String clothingImageName,
+  }) async {
+
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+      final userId = await _getUserIdFromJwt(token);
+      String base64Image = base64Encode(await personImage.readAsBytesSync());
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+
+      final body = jsonEncode({
+        'cloth_image_name' : clothingImageName,
+        'person_base64_image': base64Image,
+        'userId' : userId,
+      });
+
+      final response = await http.post(
+        Uri.parse('$nodeUrl/clothes/virtual_fitting'),
+        headers: headers,
+        body: body,
+      );
+
+      final responseBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        print("${responseBody['message']}");
+        return responseBody['base64_image'];
+      } else {
+        print("Failed to AiFit. Status code: ${response.statusCode}");
+        return "";
+      }
+
+    } catch(e){
+      print("error");
+      return "";
+    }
+  }
 // JWT 디코딩 및 유저 ID 추출
   Future <int> _getUserIdFromJwt(String token) async {
     try {
