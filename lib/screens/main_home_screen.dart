@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'marketplace_screen.dart';
 import 'account_management_screen.dart';
 import 'my_closet_screen.dart';
 
@@ -112,7 +113,12 @@ class MainHomeScreen extends StatelessWidget {
                 height: 50,
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MarketplaceScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
