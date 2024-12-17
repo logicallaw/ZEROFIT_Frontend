@@ -283,8 +283,7 @@ class ApiService {
   }
 
   Future<bool> SaleClothes({
-    required File image,
-    required String clothingName,
+    required int clothesId,
     required String postName,
     required List<String> saleType, // 다중 선택
     required int price,
@@ -301,15 +300,18 @@ class ApiService {
       // JWT에서 이메일 추출 (옵션)
       final userId = await _getUserIdFromJwt(token);
 
-      // 이미지를 Base64로 인코딩
-      String base64Image = base64Encode(await image.readAsBytesSync());
-
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
       };
       // JSON 데이터 생성
       final body = jsonEncode({
+        'clothes_id' : clothesId,
+        'post_name' : postName,
+        'sale_type' : saleType,
+        'price' : price,
+        'bank_account' : bankAccount,
+        'userId' : userId,
       });
 
       // 요청 전송

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -16,13 +17,28 @@ class MarketplaceScreen extends StatefulWidget {
 class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTickerProviderStateMixin{
   late TabController _tabController;
   var userImage;
+  int? selectedIndex;
+  List<dynamic>? items;
+  final ApiService _apiService = ApiService();
 
+  getClothes() async{
+    var result = await _apiService.getClothesInfo();
+    if(result == null)
+      return;
+
+    setState(() {
+      items =  List<dynamic>.from(result);
+    });
+    print(items![0]["clothes_id"].toString());
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    getClothes();
   }
+
 
   @override
   void dispose() {
@@ -30,6 +46,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,73 +107,117 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
           children: [
             Text("의류 구매"),
             Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: items == null
+                    ? Text('No data available')
+                    : GridView.builder(
+                  gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // 두 줄씩 배치
+                    crossAxisSpacing: 16.0, // 아이템 간 가로 간격
+                    mainAxisSpacing: 16.0, // 아이템 간 세로 간격
+                    childAspectRatio: 3 / 4, // 아이템의 가로세로 비율 조정
+                  ),
+                  itemCount: items!.length,
+                  itemBuilder: (context, index) {
+                    final item = items![index];
+                    print(item['base64_image']!.runtimeType);
+                    final Uint8List imageBytes =
+                    base64Decode(item['base64_image']!);
+                    return _buildItem(
+                      imageBytes,
+                      item['clothes_name'].toString(),
+                      item['clothes_type'].toString(),
+                      index,
+                    );
+                  },
+                ),
+              ),
+            )
+          ],
+        )
+      ),
+    );
+  }
+
+  Widget _buildItem(
+      Uint8List imageBytes, String title, String subtitle, int index) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          selectedIndex = index; // 선택된 버튼의 인덱스를 저장
+        });
+        print("Selected Item Index: $index");
+        print("Selected Item Id: ${items![index]["clothes_id"]}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Upload(userImage: imageBytes, clothesId: items![index]["clothes_id"],),
+          ),
+        );
+
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: selectedIndex == index
+              ? Color.fromRGBO(255, 182, 163, 0.5) // 선택된 경우 더 진한 색상
+              : Color.fromRGBO(255, 182, 163, 0.3),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 8,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              child: Image.memory(
+                imageBytes,
+                fit: BoxFit.cover,
+                height: 150,
+                width: double.infinity,
+              ),
+            ),
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(255, 182, 163, 0.5),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: IconButton(
-                      onPressed: () async {
-                        var picker = ImagePicker();
-                        var image = await picker.pickImage(source: ImageSource.gallery);
-                        if (image != null) {
-                          setState(() {
-                            userImage = File(image.path);
-                          });
-                        }
-                        if(userImage == null){
-                          return;
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Upload(userImage: userImage),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.image),
-                      color: Colors.white,
-                      iconSize: 80,
-                      highlightColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                    ),
-                  ),
-                  SizedBox(height: 16),
                   Text(
-                    "의류 판매를 위한 촬영",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "구겨진 옷은 반드시 펴서 촬영해주세요\n1. 옷을 입고 찍기\n2. 옷을 펴서 찍기",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    subtitle,
+                    style: TextStyle(color: Colors.black, fontSize: 13),
                   ),
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                title,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
-        )
+        ),
       ),
-
     );
   }
 }
 
+
+
+
 class Upload extends StatefulWidget {
-  const Upload({super.key, this.userImage, this.getClothes});
-  final File? userImage;
-  final getClothes;
+  const Upload({super.key, this.userImage, this.clothesId});
+  final Uint8List? userImage;
+  final clothesId;
 
   @override
   _UploadState createState() => _UploadState();
@@ -196,11 +257,20 @@ class _UploadState extends State<Upload> {
 
       // 모든 필드가 입력되었을 때 동작
       print("옷 이름: ${_clothingNameController.text}");
+      print("옷 번호: ${widget.clothesId}");
       print("거래 종류: $selectedClothingStyle");
       print("거래 가격: ${_price.text}");
       print("계좌 번호: ${_accountNumber.text}");
       print("게시 글: ${_postName.text}");
       // 여기서 등록 로직을 추가하세요
+
+      _apiService.SaleClothes(
+          clothesId: widget.clothesId,
+          postName: _postName.text,
+          saleType: selectedClothingStyle,
+          price: int.parse(_price.text),
+          bankAccount: _accountNumber.text
+      );
     }
   }
 
@@ -229,7 +299,7 @@ class _UploadState extends State<Upload> {
             Center(
               child: Column(
                 children: [
-                  Image.file(
+                  Image.memory(
                     widget.userImage!,
                     height: 150,
                     width: 150,
@@ -315,9 +385,6 @@ class _UploadState extends State<Upload> {
                 maxLines: 1,
                 controller: _accountNumber,
                 keyboardType: TextInputType.number, // 숫자 키보드 사용
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly, // 숫자만 허용
-                ],
                 decoration: InputDecoration(
                   hintText: '계좌번호를 입력해주세요.',
                   hintStyle: TextStyle(color: Colors.grey),
@@ -369,6 +436,8 @@ class _UploadState extends State<Upload> {
         ),
       ),
     );
+
+
   }
 
   Widget _buildSelectableButton(String label) {
@@ -402,6 +471,10 @@ class _UploadState extends State<Upload> {
       ),
     );
   }
+
+
+
+
 }
 
 
