@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/api_service.dart';
@@ -163,62 +164,42 @@ class Upload extends StatefulWidget {
 
 class _UploadState extends State<Upload> {
 
-  List<String> selectedClothingType = []; // 선택된 옷 종류들
-  List<String> selectedClothingStyle = []; // 선택된 옷 스타일들
+
+  List<String> selectedClothingStyle = [];
   int selectedRating = 0; // 선택된 별 개수 (만족도 수)
   final TextEditingController _clothingNameController = TextEditingController(); // 옷 이름 입력 컨트롤러
-  final TextEditingController _memoController = TextEditingController();
+  final TextEditingController _accountNumber = TextEditingController();
+  final TextEditingController _price = TextEditingController();
+  final TextEditingController _postName = TextEditingController();
   bool isClothingNameEmpty = false;
   bool isRatingEmpty = false;
   bool isClothingTypeEmpty = false;
   bool isClothingStyleEmpty = false;
+  bool isPostNameEmpty = false;
   final ApiService _apiService = ApiService();
-  late Offset _includePoint;
-  late Offset _excludePoint;
 
-  Future<void> _uploadImage() async {
-    String uploadStat ='';
 
-    final response = await _apiService.uploadImage(
-      image: widget.userImage!,
-      clothingName: _clothingNameController.text,
-      rating: selectedRating,
-      clothingTypes: selectedClothingType,
-      clothingStyles: selectedClothingStyle,
-      memo: _memoController.text,
-      includePoint: _includePoint,
-      excludePoint: _excludePoint,
-    );
-    setState(() {
-      if(response != null){
-        uploadStat = 'success';
-      }
-      else {
-        uploadStat = 'fail';
-      }
-    });
-    print(uploadStat);
-  }
 
   void _validateAndSubmit() {
     setState(() {
       // 입력 값 확인 및 상태 업데이트
       isClothingNameEmpty = _clothingNameController.text.isEmpty;
-      isRatingEmpty = selectedRating == 0;
-      isClothingTypeEmpty = selectedClothingType.isEmpty;
-      isClothingStyleEmpty = selectedClothingStyle.isEmpty;
+      isRatingEmpty = _accountNumber.text.isEmpty;
+      isClothingTypeEmpty = _price.text.isEmpty;
+      if(selectedClothingStyle == null) {
+        isClothingStyleEmpty = true;
+      }
+      isPostNameEmpty = _postName.text.isEmpty;
     });
 
-    if (!isClothingNameEmpty && !isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty) {
-      if(_memoController.text.isEmpty) {
-        _memoController.text = "";
-      }
+    if (!isClothingNameEmpty && !isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty && !isPostNameEmpty) {
+
       // 모든 필드가 입력되었을 때 동작
       print("옷 이름: ${_clothingNameController.text}");
-      print("별 점수: $selectedRating");
-      print("옷 종류: $selectedClothingType");
-      print("옷 스타일: $selectedClothingStyle");
-
+      print("거래 종류: $selectedClothingStyle");
+      print("거래 가격: ${_price.text}");
+      print("계좌 번호: ${_accountNumber.text}");
+      print("게시 글: ${_postName.text}");
       // 여기서 등록 로직을 추가하세요
     }
   }
@@ -280,17 +261,23 @@ class _UploadState extends State<Upload> {
               '거래 종류',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
+                color: isClothingStyleEmpty ? Colors.red : Colors.black,
               ),
             ),
             Wrap(
               spacing: 8,
               children: [
-                _buildSelectableButton('택배', isStyle: false),
-                _buildSelectableButton('직거래', isStyle: false),
+                _buildSelectableButton('택배'),
+                _buildSelectableButton('직거래'),
               ],
             ),
             SizedBox(height: 20),
-            Text('거래 가격 (택배비는 가격에 포함해주세요)', style: TextStyle(fontWeight: FontWeight.bold),),
+            Text('거래 가격 (택배비는 가격에 포함해주세요)',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isClothingTypeEmpty ? Colors.red : Colors.black,
+              ),
+            ),
             Container(
               padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -299,16 +286,25 @@ class _UploadState extends State<Upload> {
               ),
               child: TextField(
                 maxLines: 1,
-                controller: _memoController,
+                controller: _price,
+                keyboardType: TextInputType.number, // 숫자 키보드 사용
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // 숫자만 허용
+                ],
                 decoration: InputDecoration(
                   hintText: '판매 가격을 입력해주세요.',
-                  hintStyle: TextStyle(color: Colors.grey,),
+                  hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
                 ),
               ),
             ),
             SizedBox(height: 20),
-            Text('계좌번호 등록' , style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('계좌번호 등록',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isRatingEmpty ? Colors.red : Colors.black,
+              ),
+            ),
             Container(
               padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -317,9 +313,34 @@ class _UploadState extends State<Upload> {
               ),
               child: TextField(
                 maxLines: 1,
-                controller: _memoController,
+                controller: _accountNumber,
+                keyboardType: TextInputType.number, // 숫자 키보드 사용
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // 숫자만 허용
+                ],
                 decoration: InputDecoration(
                   hintText: '계좌번호를 입력해주세요.',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text('게시글' , style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isPostNameEmpty ? Colors.red : Colors.black,
+            )),
+            Container(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TextField(
+                maxLines: 1,
+                controller: _postName,
+                decoration: InputDecoration(
+                  hintText: '게시글을 입력해주세요',
                   hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
                 ),
@@ -350,17 +371,15 @@ class _UploadState extends State<Upload> {
     );
   }
 
-  Widget _buildSelectableButton(String label, {required bool isStyle}) {
-    bool isSelected = isStyle
-        ? selectedClothingStyle.contains(label)
-        : selectedClothingType.contains(label);
+  Widget _buildSelectableButton(String label) {
+    bool isSelected = selectedClothingStyle.contains(label);
 
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         backgroundColor: isSelected
-            ? Color.fromRGBO(255, 182, 163, 1)
-            : Color.fromRGBO(255, 182, 163, 0.5),
+            ? Color.fromRGBO(255, 182, 163, 1) // 선택된 상태 색상
+            : Color.fromRGBO(255, 182, 163, 0.5), // 비선택 상태 색상
         minimumSize: Size(60, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -368,20 +387,12 @@ class _UploadState extends State<Upload> {
       ),
       onPressed: () {
         setState(() {
-          if (isStyle) {
-            // 선택 토글
-            if (selectedClothingStyle.contains(label)) {
-              selectedClothingStyle.remove(label);
-            } else {
-              selectedClothingStyle.add(label);
-            }
+          if (isSelected) {
+            // 이미 선택된 경우 리스트에서 제거
+            selectedClothingStyle.remove(label);
           } else {
-            // 선택 토글
-            if (selectedClothingType.contains(label)) {
-              selectedClothingType.remove(label);
-            } else {
-              selectedClothingType.add(label);
-            }
+            // 선택되지 않은 경우 리스트에 추가
+            selectedClothingStyle.add(label);
           }
         });
       },

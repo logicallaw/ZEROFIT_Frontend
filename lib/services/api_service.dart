@@ -281,4 +281,64 @@ class ApiService {
       return 0;
     }
   }
+
+  Future<bool> SaleClothes({
+    required File image,
+    required String clothingName,
+    required String postName,
+    required List<String> saleType, // 다중 선택
+    required int price,
+    required String bankAccount,
+  }) async {
+    try {
+      // JWT 토큰 읽기
+      final token = await _storage.read(key: 'jwt_token');
+
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // JWT에서 이메일 추출 (옵션)
+      final userId = await _getUserIdFromJwt(token);
+
+      // 이미지를 Base64로 인코딩
+      String base64Image = base64Encode(await image.readAsBytesSync());
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+      // JSON 데이터 생성
+      final body = jsonEncode({
+      });
+
+      // 요청 전송
+      final response = await http.post(
+        Uri.parse('$nodeUrl/market/sale'),
+        headers: headers,
+        body: body,
+      );
+      final responseBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        print("${responseBody['message']}");
+        return true;
+      } else {
+        // 실패한 경우 응답 로그
+        print("Failed to upload. Status code: ${response.statusCode}");
+        try {
+          final responseBody = jsonDecode(response.body);
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return false;
+      }
+    } catch (e) {
+      // 네트워크 오류 또는 기타 에러 처리
+      print("Error occurred while uploading: $e");
+      return false;
+    }
+  }
+
+
 }
