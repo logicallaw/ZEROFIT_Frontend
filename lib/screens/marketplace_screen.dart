@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/api_service.dart';
+import 'wish_list.dart';
 
 class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
@@ -20,6 +21,31 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
   int? selectedIndex;
   List<dynamic>? items;
   final ApiService _apiService = ApiService();
+  List<dynamic>? marketItems;
+  List<Uint8List> decodedImages = [];
+  int currentIndex = 0;
+  getMarketClothes() async {
+    var result = await _apiService.getMarketPlaceInfo();
+    if(result == null)
+      return;
+
+    setState(() {
+      marketItems = List<dynamic>.from(result);
+      decodedImages = marketItems!
+          .map<Uint8List>((item) {
+        final base64Image = item['base64_image'] as String?;
+        if (base64Image != null) {
+          return base64Decode(base64Image); // Base64 디코딩
+        }
+        return Uint8List(0); // null 처리 (빈 데이터)
+      })
+          .where((decoded) => decoded.isNotEmpty)
+          .toList();
+      currentIndex = 0;
+    });
+
+    print(decodedImages);
+  }
 
   getClothes() async{
     var result = await _apiService.getClothesInfo();
@@ -31,12 +57,34 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
     });
     print(items![0]["clothes_id"].toString());
   }
+
+  uploadWishlist(int index) async {
+    var result = await _apiService.uploadWishList(clothesId: marketItems![currentIndex]["clothes_id"]);
+  }
+
+  void onSwipe(String direction) {
+    print('User swiped $direction');
+    print("currentIndex : $currentIndex");
+    if(direction == 'right'){
+      uploadWishlist(currentIndex);
+    }
+    setState(() {
+      if (currentIndex < decodedImages.length - 1) {
+        currentIndex++;
+      } else {
+        // 마지막 이미지에서 처음 이미지로 돌아가기
+        currentIndex = 0;
+      }
+    });
+
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     getClothes();
+    getMarketClothes();
   }
 
 
@@ -46,6 +94,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
     _tabController.dispose();
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +155,107 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
           controller: _tabController,
           physics: NeverScrollableScrollPhysics(),
           children: [
-            Text("의류 구매"),
+            decodedImages.isEmpty
+                ? Center(child: Text("로딩중"))
+                : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                // Dismissible로 이미지 부분만 감싸기
+                Expanded(
+                  flex: 8,
+                  child: Stack(
+                    children: [
+                      // 이미지 부분
+                      Dismissible(
+                        key: ValueKey(decodedImages[currentIndex]),
+                        direction: DismissDirection.horizontal,
+                        onDismissed: (direction) {
+                          if (direction == DismissDirection.endToStart) {
+                            onSwipe('left'); // 왼쪽으로 스와이프
+                          } else if (direction == DismissDirection.startToEnd) {
+                            onSwipe('right'); // 오른쪽으로 스와이프
+                          }
+                        },
+                        child: Center(
+                          child: Image.memory(
+                            decodedImages[currentIndex],
+                            fit: BoxFit.contain, // 이미지 비율 유지
+                            width: double.infinity,
+                          ),
+                        ),
+                      ),
+
+                      // 위시리스트 아이콘 (이미지 위 오른쪽 상단)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: GestureDetector(
+                          onTap: () {
+                            print("위시리스트로 이동!");
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const WishList(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.shopping_bag,
+                                  size: 40, color: Colors.blueAccent),
+                              Text(
+                                "WishList",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+
+                // 안내 문구 (화면에 고정됨)
+                Text(
+                  "마음에 드는 옷은 오른쪽\n그렇지 않으면 왼쪽으로 넘겨주세요!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+
+                // 아이콘 영역 (화면에 고정됨)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        Icon(Icons.sentiment_very_dissatisfied, size: 50, color: Colors.orange),
+
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Icon(Icons.search, size: 50, color: Colors.blue),
+
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Icon(Icons.sentiment_very_satisfied, size: 50, color: Colors.pink),
+
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -122,7 +272,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                   itemCount: items!.length,
                   itemBuilder: (context, index) {
                     final item = items![index];
-                    print(item['base64_image']!.runtimeType);
                     final Uint8List imageBytes =
                     base64Decode(item['base64_image']!);
                     return _buildItem(
@@ -160,9 +309,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
       },
       child: Container(
         decoration: BoxDecoration(
-          color: selectedIndex == index
-              ? Color.fromRGBO(255, 182, 163, 0.5) // 선택된 경우 더 진한 색상
-              : Color.fromRGBO(255, 182, 163, 0.3),
+          color: Color.fromRGBO(255, 182, 163, 0.5),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -271,7 +418,12 @@ class _UploadState extends State<Upload> {
           price: int.parse(_price.text),
           bankAccount: _accountNumber.text
       );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("판매 등록 성공!")),
+      );
     }
+
+    Navigator.pop(context);
   }
 
 

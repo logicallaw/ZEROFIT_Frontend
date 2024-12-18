@@ -145,6 +145,8 @@ class ApiService {
         'excludePoint': {'x': excludePoint.dx, 'y': excludePoint.dy}, // 제외 좌표
       });
 
+
+
       // 요청 전송
       final response = await http.post(
         Uri.parse('$nodeUrl/clothes/upload_image'),
@@ -342,5 +344,137 @@ class ApiService {
     }
   }
 
+  Future<List<dynamic>?> getMarketPlaceInfo() async {
+    try{
+      final token = await _storage.read(key: 'jwt_token');
 
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final userId = await _getUserIdFromJwt(token);
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+
+      final body = jsonEncode({
+        'userId' : userId,
+      });
+      final response = await http.post(
+        Uri.parse('$nodeUrl/market/info'),
+        headers: headers,
+        body: body,
+      );
+      final responseBody = jsonDecode(response.body);
+      if(response.statusCode == 200) {
+        print(responseBody["clothes"].runtimeType);
+        return responseBody["clothes"];
+      } else {
+        try {
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return null;
+      }
+    }catch (e) {
+      return null;
+    }
+
+  }
+
+  Future<bool> uploadWishList({
+    required int clothesId
+  }) async {
+    try {
+      // JWT 토큰 읽기
+      final token = await _storage.read(key: 'jwt_token');
+
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // JWT에서 이메일 추출 (옵션)
+      final userId = await _getUserIdFromJwt(token);
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+      // JSON 데이터 생성
+      final body = jsonEncode({
+        'userId' : userId,
+        'clothes_id' : clothesId,
+      });
+
+      // 요청 전송
+      final response = await http.post(
+        Uri.parse('$nodeUrl/wishlist/add'),
+        headers: headers,
+        body: body,
+      );
+      final responseBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        print("${responseBody['message']}");
+        return true;
+      } else {
+        // 실패한 경우 응답 로그
+        print("Failed to upload. Status code: ${response.statusCode}");
+        try {
+          final responseBody = jsonDecode(response.body);
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return false;
+      }
+    } catch (e) {
+      // 네트워크 오류 또는 기타 에러 처리
+      print("Error occurred while uploading: $e");
+      return false;
+    }
+  }
+
+  Future<List<dynamic>?> getWishListInfo() async {
+    try{
+      final token = await _storage.read(key: 'jwt_token');
+
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final userId = await _getUserIdFromJwt(token);
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+
+      final body = jsonEncode({
+        'userId' : userId,
+      });
+      final response = await http.post(
+        Uri.parse('$nodeUrl/wishlist/info'),
+        headers: headers,
+        body: body,
+      );
+      final responseBody = jsonDecode(response.body);
+      if(response.statusCode == 200) {
+        print(responseBody["clothes"].runtimeType);
+        return responseBody["clothes"];
+      } else {
+        try {
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return null;
+      }
+    }catch (e) {
+      return null;
+    }
+
+  }
 }

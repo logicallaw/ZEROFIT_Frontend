@@ -56,6 +56,8 @@ class _ImageMaskingScreenState extends State<ImageMaskingScreen> {
       return;
     }
 
+    print(_includePoint);
+    print(_excludePoint);
     widget.onSubmit(
       includePoint: _includePoint!,
       excludePoint: _excludePoint!,
