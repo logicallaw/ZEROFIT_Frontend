@@ -227,12 +227,12 @@ class _LoginScreenState extends State<LoginScreen>
                   child: ElevatedButton(
                     onPressed: _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFB1B1),
+                      backgroundColor: Colors.black87,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text('로그인'),
+                    child: const Text('로그인', style: TextStyle(color: Colors.white),),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -346,12 +346,12 @@ class _LoginScreenState extends State<LoginScreen>
                   child: ElevatedButton(
                     onPressed: _signup,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFB1B1),
+                      backgroundColor: Colors.black87,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text('회원가입'),
+                    child: const Text('회원가입' , style: TextStyle(color: Colors.white),),
                   ),
                 ),
                 const SizedBox(height: 20),

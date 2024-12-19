@@ -61,6 +61,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
           },
           icon: Icon(Icons.keyboard_arrow_left),
           highlightColor: Colors.transparent,
+          color: Colors.black87,
         ),
         actions: [
           IconButton(
@@ -74,12 +75,13 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
               );
             },
             highlightColor: Colors.transparent,
+            color: Colors.black87,
           ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(48),
           child: Container(
-            color: Color.fromRGBO(255, 182, 163, 0.5),
+            color: Colors.black87,
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
@@ -91,8 +93,8 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                 vertical: 4,
               ),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black,
+              labelColor: Colors.black87,
+              unselectedLabelColor: Colors.white,
               tabs: [
                 Tab(text: "나의 옷장"),
                 Tab(text: "AI 피팅"),
@@ -114,7 +116,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: items == null ?  Text('No data available')
+                child: items == null ?  Text('옷을 등록해주세요!')
                  : GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, // 두 줄씩 배치
@@ -136,9 +138,9 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(255, 182, 163, 0.5),
+                      color: Colors.black87,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: IconButton(
@@ -157,7 +159,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                       },
                       icon: Icon(Icons.image),
                       color: Colors.white,
-                      iconSize: 80,
+                      iconSize: 100,
                       highlightColor: Colors.transparent,
                       hoverColor: Colors.transparent,
                     ),
@@ -187,9 +189,9 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(255, 182, 163, 0.5),
+                      color: Colors.black87,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: IconButton(
@@ -213,7 +215,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                       },
                       icon: Icon(Icons.image),
                       color: Colors.white,
-                      iconSize: 80,
+                      iconSize: 100,
                       highlightColor: Colors.transparent,
                       hoverColor: Colors.transparent,
                     ),
@@ -249,7 +251,7 @@ Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
   return Container(
 
     decoration: BoxDecoration(
-      color: Color.fromRGBO(255, 182, 163, 0.3),
+      color: Colors.black87,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
@@ -275,14 +277,14 @@ Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Text(
             subtitle,
-            style: TextStyle(color: Colors.black, fontSize: 13),
+            style: TextStyle(color: Colors.white, fontSize: 13),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white),
           ),
         ),
       ],
@@ -395,7 +397,8 @@ class _UploadState extends State<Upload> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.close),
+          icon: Icon(Icons.keyboard_arrow_left),
+          color: Colors.black87,
         ),
         title: Text(
           '옷 등록',
@@ -403,144 +406,147 @@ class _UploadState extends State<Upload> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
+      body: Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Image.file(
+                      widget.userImage!,
+                      height: 150,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
+                    SizedBox(height: 8),
+                  ],
+                ),
+              ),
+              Text(
+                '옷 이름',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isClothingNameEmpty ? Colors.red : Colors.black,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                controller: _clothingNameController,
+                decoration: InputDecoration(
+                  hintText: '옷 이름을 입력하세요',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none, // Border 제거
+                ),
+              ),
+              SizedBox(height: 12),
+              Text(
+                '얼마나 만족하나요?',
+                style: TextStyle(
+                  color: isRatingEmpty ? Colors.red : Colors.black,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: List.generate(5, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        // 선택된 별 수를 업데이트
+                        selectedRating = index + 1;
+                      });
+                    },
+                    child: Icon(
+                      index < selectedRating ? Icons.star : Icons.star_border,
+                      color: Colors.black87,
+                      size: 24, // 별 크기 조절 가능
+                    ),
+                  );
+                }).map((icon) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: icon,
+                )).toList(), // 별 사이의 간격을 줄이기 위해 Padding 추가
+              ),
+              SizedBox(height: 20),
+              Text(
+                '옷 종류',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isClothingTypeEmpty ? Colors.red : Colors.black,
+                ),
+              ),
+              Wrap(
+                spacing: 8,
                 children: [
-                  Image.file(
-                    widget.userImage!,
-                    height: 150,
-                    width: 150,
-                    fit: BoxFit.cover,
-                  ),
-                  SizedBox(height: 8),
+                  _buildSelectableButton('상의', isStyle: false),
+                  _buildSelectableButton('하의', isStyle: false),
+                  _buildSelectableButton('외투', isStyle: false),
+                  _buildSelectableButton('원피스', isStyle: false),
+                  _buildSelectableButton('액세서리', isStyle: false),
                 ],
               ),
-            ),
-            Text(
-              '옷 이름',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isClothingNameEmpty ? Colors.red : Colors.black,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            TextField(
-              controller: _clothingNameController,
-              decoration: InputDecoration(
-                hintText: '옷 이름을 입력하세요',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none, // Border 제거
-              ),
-            ),
-            SizedBox(height: 12),
-            Text(
-              '얼마나 만족하나요?',
-              style: TextStyle(
-                color: isRatingEmpty ? Colors.red : Colors.black,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: List.generate(5, (index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      // 선택된 별 수를 업데이트
-                      selectedRating = index + 1;
-                    });
-                  },
-                  child: Icon(
-                    index < selectedRating ? Icons.star : Icons.star_border,
-                    color: Color.fromRGBO(255, 182, 163, 1.0),
-                    size: 24, // 별 크기 조절 가능
-                  ),
-                );
-              }).map((icon) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                child: icon,
-              )).toList(), // 별 사이의 간격을 줄이기 위해 Padding 추가
-            ),
-            SizedBox(height: 20),
-            Text(
-              '옷 종류',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isClothingTypeEmpty ? Colors.red : Colors.black,
-              ),
-            ),
-            Wrap(
-              spacing: 8,
-              children: [
-                _buildSelectableButton('상의', isStyle: false),
-                _buildSelectableButton('하의', isStyle: false),
-                _buildSelectableButton('외투', isStyle: false),
-                _buildSelectableButton('원피스', isStyle: false),
-                _buildSelectableButton('액세서리', isStyle: false),
-              ],
-            ),
-            SizedBox(height: 20),
-            Text(
-              '옷 스타일',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isClothingStyleEmpty ? Colors.red : Colors.black,
-              ),
-            ),
-            Wrap(
-              spacing: 8,
-              children: [
-                _buildSelectableButton('캐주얼', isStyle: true),
-                _buildSelectableButton('빈티지', isStyle: true),
-                _buildSelectableButton('포멀', isStyle: true),
-                _buildSelectableButton('미니멀', isStyle: true),
-              ],
-            ),
-            SizedBox(height: 20),
-            Text('옷에 대한 추가적인 메모를 작성해주세요.'),
-            SizedBox(height: 8),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                maxLines: 3,
-                controller: _memoController,
-                decoration: InputDecoration(
-                  hintText: '의류 관리법을 입력하세요.',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
+              SizedBox(height: 20),
+              Text(
+                '옷 스타일',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isClothingStyleEmpty ? Colors.red : Colors.black,
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.brown,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              Wrap(
+                spacing: 8,
+                children: [
+                  _buildSelectableButton('캐주얼', isStyle: true),
+                  _buildSelectableButton('빈티지', isStyle: true),
+                  _buildSelectableButton('포멀', isStyle: true),
+                  _buildSelectableButton('미니멀', isStyle: true),
+                ],
+              ),
+              SizedBox(height: 20),
+              Text('옷에 대한 추가적인 메모를 작성해주세요.'),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                onPressed: _validateAndSubmit,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  child: Text(
-                    '옷장에 등록하기',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                child: TextField(
+                  maxLines: 3,
+                  controller: _memoController,
+                  decoration: InputDecoration(
+                    hintText: '의류 관리법을 입력하세요.',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
                   ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _validateAndSubmit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    child: Text(
+                      '옷장에 등록하기',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -555,8 +561,8 @@ class _UploadState extends State<Upload> {
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         backgroundColor: isSelected
-            ? Color.fromRGBO(255, 182, 163, 1)
-            : Color.fromRGBO(255, 182, 163, 0.5),
+            ? Colors.black87
+            : Colors.grey,
         minimumSize: Size(60, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -583,7 +589,11 @@ class _UploadState extends State<Upload> {
       },
       child: Text(
         label,
-        style: TextStyle(color: Colors.black, fontSize: 12),
+        style: TextStyle(
+            color: isSelected
+            ? Colors.white
+            : Colors.black87,
+            fontSize: 12),
       ),
     );
   }

@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../services/api_service.dart';
 import 'wish_list.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'market_ai_fitting.dart';
 
 class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
@@ -44,7 +44,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
       currentIndex = 0;
     });
 
-    print(decodedImages);
   }
 
   getClothes() async{
@@ -112,6 +111,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
           },
           icon: Icon(Icons.keyboard_arrow_left),
           highlightColor: Colors.transparent,
+          color: Colors.black87,
         ),
         actions: [
           IconButton(
@@ -119,12 +119,13 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
             onPressed: () {
             },
             highlightColor: Colors.transparent,
+            color: Colors.black87,
           ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(48),
           child: Container(
-            color: Color.fromRGBO(255, 182, 163, 0.5),
+            color: Colors.black87,
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
@@ -136,8 +137,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                 vertical: 4,
               ),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black,
+              labelColor: Colors.black87,
+              unselectedLabelColor: Colors.white,
               tabs: [
                 Tab(text: "의류 구매"),
                 Tab(text: "의류 판매"),
@@ -156,7 +157,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
           physics: NeverScrollableScrollPhysics(),
           children: [
             decodedImages.isEmpty
-                ? Center(child: Text("로딩중"))
+                ? SpinKitWave(
+              // 색상을 파란색으로 설정
+              color: Colors.black87,
+              // 크기를 50.0으로 설정
+              size: 50.0,
+              // 애니메이션 수행 시간을 2초로 설정
+              duration: Duration(seconds: 2),
+            )
                 : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -241,14 +249,21 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                     ),
                     Column(
                       children: [
-                        Icon(Icons.search, size: 50, color: Colors.blue),
-
+                        IconButton(onPressed: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MarketAiFitting(
+                                image_name: items![currentIndex]["image_name"],
+                              ),
+                            ),
+                          );
+                        }, icon: Icon(Icons.search, size: 50, color: Colors.blue)),
                       ],
                     ),
                     Column(
                       children: [
                         Icon(Icons.sentiment_very_satisfied, size: 50, color: Colors.pink),
-
                       ],
                     ),
                   ],
@@ -260,7 +275,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: items == null
-                    ? Text('No data available')
+                    ? Text('옷을 등록해주세요!')
                     : GridView.builder(
                   gridDelegate:
                   SliverGridDelegateWithFixedCrossAxisCount(
@@ -309,7 +324,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Color.fromRGBO(255, 182, 163, 0.5),
+          color: Colors.black87,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -339,7 +354,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                 children: [
                   Text(
                     subtitle,
-                    style: TextStyle(color: Colors.black, fontSize: 13),
+                    style: TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ],
               ),
@@ -348,7 +363,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
               ),
             ),
           ],
@@ -435,7 +450,8 @@ class _UploadState extends State<Upload> {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: Icon(Icons.close),
+          icon: Icon(Icons.keyboard_arrow_left),
+          color: Colors.black87,
         ),
         title: Text(
           '의류 장터 옷 등록',
@@ -443,148 +459,151 @@ class _UploadState extends State<Upload> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
+      body: Container(
+        color: Colors.white,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Image.memory(
+                      widget.userImage!,
+                      height: 150,
+                      width: 150,
+                      fit: BoxFit.cover,
+                    ),
+                    SizedBox(height: 8),
+                  ],
+                ),
+              ),
+              Text(
+                '옷 이름',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isClothingNameEmpty ? Colors.red : Colors.black,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              TextField(
+                controller: _clothingNameController,
+                decoration: InputDecoration(
+                  hintText: '옷 이름을 입력하세요',
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: InputBorder.none, // Border 제거
+                ),
+              ),
+              SizedBox(height: 12),
+              Text(
+                '거래 종류',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isClothingStyleEmpty ? Colors.red : Colors.black,
+                ),
+              ),
+              Wrap(
+                spacing: 8,
                 children: [
-                  Image.memory(
-                    widget.userImage!,
-                    height: 150,
-                    width: 150,
-                    fit: BoxFit.cover,
-                  ),
-                  SizedBox(height: 8),
+                  _buildSelectableButton('택배'),
+                  _buildSelectableButton('직거래'),
                 ],
               ),
-            ),
-            Text(
-              '옷 이름',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isClothingNameEmpty ? Colors.red : Colors.black,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            TextField(
-              controller: _clothingNameController,
-              decoration: InputDecoration(
-                hintText: '옷 이름을 입력하세요',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none, // Border 제거
-              ),
-            ),
-            SizedBox(height: 12),
-            Text(
-              '거래 종류',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isClothingStyleEmpty ? Colors.red : Colors.black,
-              ),
-            ),
-            Wrap(
-              spacing: 8,
-              children: [
-                _buildSelectableButton('택배'),
-                _buildSelectableButton('직거래'),
-              ],
-            ),
-            SizedBox(height: 20),
-            Text('거래 가격 (택배비는 가격에 포함해주세요)',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isClothingTypeEmpty ? Colors.red : Colors.black,
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                maxLines: 1,
-                controller: _price,
-                keyboardType: TextInputType.number, // 숫자 키보드 사용
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly, // 숫자만 허용
-                ],
-                decoration: InputDecoration(
-                  hintText: '판매 가격을 입력해주세요.',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
+              SizedBox(height: 20),
+              Text('거래 가격 (택배비는 가격에 포함해주세요)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isClothingTypeEmpty ? Colors.red : Colors.black,
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text('계좌번호 등록',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isRatingEmpty ? Colors.red : Colors.black,
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                maxLines: 1,
-                controller: _accountNumber,
-                keyboardType: TextInputType.number, // 숫자 키보드 사용
-                decoration: InputDecoration(
-                  hintText: '계좌번호를 입력해주세요.',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
+              Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text('게시글' , style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isPostNameEmpty ? Colors.red : Colors.black,
-            )),
-            Container(
-              padding: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                maxLines: 1,
-                controller: _postName,
-                decoration: InputDecoration(
-                  hintText: '게시글을 입력해주세요',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            SizedBox(height: 40),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.brown,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: _validateAndSubmit,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  child: Text(
-                    '의류 장터에 등록하기',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                child: TextField(
+                  maxLines: 1,
+                  controller: _price,
+                  keyboardType: TextInputType.number, // 숫자 키보드 사용
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // 숫자만 허용
+                  ],
+                  decoration: InputDecoration(
+                    hintText: ' 판매 가격을 입력해주세요.',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
                   ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Text('계좌번호 등록',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isRatingEmpty ? Colors.red : Colors.black,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextField(
+                  maxLines: 1,
+                  controller: _accountNumber,
+                  keyboardType: TextInputType.number, // 숫자 키보드 사용
+                  decoration: InputDecoration(
+                    hintText: ' 계좌번호를 입력해주세요.',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text('게시글' , style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isPostNameEmpty ? Colors.red : Colors.black,
+              )),
+              Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextField(
+                  maxLines: 1,
+                  controller: _postName,
+                  decoration: InputDecoration(
+                    hintText: ' 게시글을 입력해주세요',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 40),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _validateAndSubmit,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    child: Text(
+                      '의류 장터에 등록하기',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -599,8 +618,8 @@ class _UploadState extends State<Upload> {
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         backgroundColor: isSelected
-            ? Color.fromRGBO(255, 182, 163, 1) // 선택된 상태 색상
-            : Color.fromRGBO(255, 182, 163, 0.5), // 비선택 상태 색상
+            ? Colors.black87 // 선택된 상태 색상
+            : Colors.grey, // 비선택 상태 색상
         minimumSize: Size(60, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -619,7 +638,12 @@ class _UploadState extends State<Upload> {
       },
       child: Text(
         label,
-        style: TextStyle(color: Colors.black, fontSize: 12),
+        style: TextStyle(
+          color: isSelected
+          ? Colors.white
+          : Colors.black87,
+          fontSize: 12,
+        ),
       ),
     );
   }

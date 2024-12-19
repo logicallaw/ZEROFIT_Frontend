@@ -46,7 +46,7 @@ class _AiFittingState extends State<AiFitting> {
             Navigator.pop(context);
           },
           icon: Icon(Icons.keyboard_arrow_left),
-          color: Color.fromRGBO(255, 182, 163, 0.5),
+          color: Colors.black87,
         ),
         title: const Text('AI 피팅',
             style: TextStyle(
@@ -80,7 +80,7 @@ class _AiFittingState extends State<AiFitting> {
               : Padding(
             padding: const EdgeInsets.all(16.0),
             child: widget.items == null
-                ? Text('No data available')
+                ? Text('옷을 등록해주세요!')
                 : GridView.builder(
               gridDelegate:
               SliverGridDelegateWithFixedCrossAxisCount(
@@ -124,7 +124,7 @@ class _AiFittingState extends State<AiFitting> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF5A4033), // 버튼 배경색
+              backgroundColor: Colors.black87, // 버튼 배경색
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
               ),
@@ -156,9 +156,7 @@ class _AiFittingState extends State<AiFitting> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: selectedIndex == index
-              ? Color.fromRGBO(255, 182, 163, 0.5) // 선택된 경우 더 진한 색상
-              : Color.fromRGBO(255, 182, 163, 0.3),
+          color: Colors.black87,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -188,13 +186,13 @@ class _AiFittingState extends State<AiFitting> {
                 children: [
                   Text(
                     subtitle,
-                    style: TextStyle(color: Colors.black, fontSize: 13),
+                    style: TextStyle(color: Colors.white, fontSize: 13),
                   ),
                   Icon(
                     Icons.favorite,
                     color: selectedIndex == index
                         ? Color.fromRGBO(255, 182, 163, 1)
-                        : Colors.grey.withOpacity(0.5),
+                        : Colors.white,
                   ),
                 ],
               ),
@@ -203,7 +201,7 @@ class _AiFittingState extends State<AiFitting> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
               ),
             ),
           ],

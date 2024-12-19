@@ -477,4 +477,56 @@ class ApiService {
     }
 
   }
+
+  Future<bool> purchaseClothes({
+    required int clothesId
+  }) async {
+    try {
+      // JWT 토큰 읽기
+      final token = await _storage.read(key: 'jwt_token');
+
+      if (token == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // JWT에서 이메일 추출 (옵션)
+      final userId = await _getUserIdFromJwt(token);
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // JWT 인증 헤더 추가
+      };
+      // JSON 데이터 생성
+      final body = jsonEncode({
+        'userId' : userId,
+        'clothes_id' : clothesId,
+      });
+
+      // 요청 전송
+      final response = await http.post(
+        Uri.parse('$nodeUrl/market/purchase'),
+        headers: headers,
+        body: body,
+      );
+      final responseBody = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        print("${responseBody['message']}");
+        return true;
+      } else {
+        // 실패한 경우 응답 로그
+        print("Failed to upload. Status code: ${response.statusCode}");
+        try {
+          final responseBody = jsonDecode(response.body);
+          print("Error message: ${responseBody['message']}");
+        } catch (e) {
+          print("Error decoding response: $e");
+        }
+        return false;
+      }
+    } catch (e) {
+      // 네트워크 오류 또는 기타 에러 처리
+      print("Error occurred while buying: $e");
+      return false;
+    }
+  }
 }
