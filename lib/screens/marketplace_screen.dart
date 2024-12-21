@@ -275,7 +275,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: items == null
-                    ? Text('옷을 등록해주세요!')
+                    ? Text('옷을 등록해주세요!' ,style: TextStyle(color: Colors.grey))
                     : GridView.builder(
                   gridDelegate:
                   SliverGridDelegateWithFixedCrossAxisCount(

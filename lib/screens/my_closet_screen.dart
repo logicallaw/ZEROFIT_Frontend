@@ -116,7 +116,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: items == null ?  Text('옷을 등록해주세요!')
+                child: items == null ?  Text('옷을 등록해주세요!', style: TextStyle(color: Colors.grey),)
                  : GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, // 두 줄씩 배치

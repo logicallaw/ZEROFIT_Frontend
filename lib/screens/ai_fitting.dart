@@ -80,7 +80,7 @@ class _AiFittingState extends State<AiFitting> {
               : Padding(
             padding: const EdgeInsets.all(16.0),
             child: widget.items == null
-                ? Text('옷을 등록해주세요!')
+                ? Text('옷을 등록해주세요!' ,style: TextStyle(color: Colors.grey))
                 : GridView.builder(
               gridDelegate:
               SliverGridDelegateWithFixedCrossAxisCount(
