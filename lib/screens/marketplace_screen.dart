@@ -54,7 +54,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
     setState(() {
       items =  List<dynamic>.from(result);
     });
-    print(items![0]["clothes_id"].toString());
   }
 
   uploadWishlist(int index) async {
@@ -63,7 +62,6 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
 
   void onSwipe(String direction) {
     print('User swiped $direction');
-    print("currentIndex : $currentIndex");
     if(direction == 'right'){
       uploadWishlist(currentIndex);
     }
@@ -75,7 +73,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
         currentIndex = 0;
       }
     });
-
+    print("currentIndex : $currentIndex");
+    print(marketItems![currentIndex]["image_name"]);
   }
   @override
   void initState() {
@@ -254,7 +253,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                             context,
                             MaterialPageRoute(
                               builder: (context) => MarketAiFitting(
-                                image_name: items![currentIndex]["image_name"],
+                                image_name: marketItems![currentIndex]["image_name"],
                               ),
                             ),
                           );

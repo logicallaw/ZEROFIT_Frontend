@@ -20,6 +20,8 @@ class _MarketAiFittingState extends State<MarketAiFitting> {
   var personImage;
 
   getAiFitting(String image_name) async {
+    print(image_name);
+
     var result = await _apiService.getAiFitting(
       personImage: personImage,
       clothingImageName: image_name,
@@ -97,7 +99,7 @@ class _MarketAiFittingState extends State<MarketAiFitting> {
                     setState(() {
                       personImage = File(image.path);
                     });
-                    getAiFitting(widget.image_name);
+                    getAiFitting(widget.image_name.toString());
                   },
                   icon: Icon(Icons.image),
                   color: Colors.white,
