@@ -137,6 +137,7 @@ class _WishListState extends State<WishList> {
                   Text(
                     "가격 : ${subtitle}원",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   TextButton(
                     onPressed: () {
@@ -173,6 +174,7 @@ class _WishListState extends State<WishList> {
               child: Text(
                 title,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -206,8 +208,11 @@ class _PurchasePageState extends State<PurchasePage> {
     if(widget.item == null)
       return;
 
-    _apiService.purchaseClothes(clothesId: widget.item["clothes_id"]);
-    Navigator.pop(context);
+
+
+      Navigator.pop(context);
+      showPurchaseDialog(context);
+
   }
 
   @override
@@ -393,6 +398,59 @@ class _PurchasePageState extends State<PurchasePage> {
           ),
         ),
       ),
+    );
+  }
+
+  void showPurchaseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          content: SizedBox(
+            width: 200,
+            height: 150,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "구매 완료!",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // 버튼 배경색
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 80),
+                    child: Text(
+                      "확인",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

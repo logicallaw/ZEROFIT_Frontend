@@ -85,6 +85,7 @@ class _ImageMaskingScreenState extends State<ImageMaskingScreen> {
             Navigator.pop(context);
           },
           icon: const Icon(Icons.keyboard_arrow_left),
+          color: Colors.black87,
         ),
       ),
       body: Column(
@@ -99,7 +100,7 @@ class _ImageMaskingScreenState extends State<ImageMaskingScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.brown,
+                  color: Colors.black87,
                 ),
                 children: [
                   TextSpan(text: "옷을 착용할 영역은 "),
@@ -160,7 +161,7 @@ class _ImageMaskingScreenState extends State<ImageMaskingScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      backgroundColor: Colors.brown,
+                      backgroundColor: Colors.black87,
                     ),
                     child: const Text(
                       '포인터 새로 지정하기',
@@ -179,7 +180,7 @@ class _ImageMaskingScreenState extends State<ImageMaskingScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      backgroundColor: Colors.brown,
+                      backgroundColor: Colors.black87,
                     ),
                     child: const Text(
                       '포인터 저장',

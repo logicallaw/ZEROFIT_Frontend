@@ -128,7 +128,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                   itemBuilder: (context, index) {
                     final item = items![index];
                     final Uint8List imageBytes = base64Decode(item['base64_image']!);
-                    return _buildItem(imageBytes, item['clothes_name'].toString(), item['clothes_type'].toString());
+                    return _buildItem(imageBytes, item['clothes_name'].toString(), item['clothes_type'].join(' '));
                   },
                 ),
               ),
@@ -278,6 +278,7 @@ Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
           child: Text(
             subtitle,
             style: TextStyle(color: Colors.white, fontSize: 13),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Padding(
@@ -285,6 +286,7 @@ Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
           child: Text(
             title,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color: Colors.white),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

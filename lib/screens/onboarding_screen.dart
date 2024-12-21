@@ -101,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 child: const Text(
                   '지금 시작하기',
-                  style: TextStyle(color: Colors.pink),
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
             ),

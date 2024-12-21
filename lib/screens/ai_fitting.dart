@@ -98,7 +98,7 @@ class _AiFittingState extends State<AiFitting> {
                 return _buildItem(
                   imageBytes,
                   item['clothes_name'].toString(),
-                  item['clothes_type'].toString(),
+                  item['clothes_type'].join(' '),
                   index,
                 );
               },
@@ -187,6 +187,7 @@ class _AiFittingState extends State<AiFitting> {
                   Text(
                     subtitle,
                     style: TextStyle(color: Colors.white, fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Icon(
                     Icons.favorite,
@@ -202,6 +203,7 @@ class _AiFittingState extends State<AiFitting> {
               child: Text(
                 title,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

@@ -292,7 +292,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                     return _buildItem(
                       imageBytes,
                       item['clothes_name'].toString(),
-                      item['clothes_type'].toString(),
+                      item['clothes_type'].join(' '),
                       index,
                     );
                   },
@@ -355,6 +355,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                   Text(
                     subtitle,
                     style: TextStyle(color: Colors.white, fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -364,6 +365,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               child: Text(
                 title,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
