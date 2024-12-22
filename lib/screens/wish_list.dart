@@ -36,6 +36,7 @@ class _WishListState extends State<WishList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -51,6 +52,12 @@ class _WishListState extends State<WishList> {
               fontSize: 14,
             )),
         centerTitle: true,
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.1,
+          ),
+        ),
       ),
 
       body: Container(

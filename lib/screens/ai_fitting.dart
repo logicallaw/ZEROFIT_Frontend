@@ -40,6 +40,7 @@ class _AiFittingState extends State<AiFitting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -54,8 +55,15 @@ class _AiFittingState extends State<AiFitting> {
               fontSize: 14,
             )),
         centerTitle: true,
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.1,
+          ),
+        ),
       ),
       body: Container(
+        color: Colors.white,
         child: Center(
           child: fitImage != null
               ? Column(
@@ -98,7 +106,7 @@ class _AiFittingState extends State<AiFitting> {
                 return _buildItem(
                   imageBytes,
                   item['clothes_name'].toString(),
-                  item['clothes_type'].join(' '),
+                  item['clothes_type'].join('#'),
                   index,
                 );
               },
@@ -106,37 +114,40 @@ class _AiFittingState extends State<AiFitting> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SizedBox(
-          width: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              if (selectedIndex != null) {
-                print("Selected Item Index: $selectedIndex");
-                String image_name =
-                widget.items[selectedIndex]['image_name'].toString();
-                getAiFitting(image_name);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("먼저 아이템을 선택해주세요.")),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black87, // 버튼 배경색
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                if (selectedIndex != null) {
+                  print("Selected Item Index: $selectedIndex");
+                  String image_name =
+                  widget.items[selectedIndex]['image_name'].toString();
+                  getAiFitting(image_name);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("먼저 아이템을 선택해주세요.")),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black87, // 버튼 배경색
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
+                ),
+                padding:
+                EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 버튼 높이 조정
               ),
-              padding:
-              EdgeInsets.symmetric(vertical: 12, horizontal: 24), // 버튼 높이 조정
-            ),
-            child: Text(
-              '옷 입어보기',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              child: Text(
+                '옷 입어보기',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -185,14 +196,14 @@ class _AiFittingState extends State<AiFitting> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    subtitle,
+                    "#" + subtitle,
                     style: TextStyle(color: Colors.white, fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Icon(
                     Icons.favorite,
                     color: selectedIndex == index
-                        ? Color.fromRGBO(255, 182, 163, 1)
+                        ? Color(0xFFFF9990)
                         : Colors.white,
                   ),
                 ],

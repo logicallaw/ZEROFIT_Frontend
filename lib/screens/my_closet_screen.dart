@@ -128,7 +128,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                   itemBuilder: (context, index) {
                     final item = items![index];
                     final Uint8List imageBytes = base64Decode(item['base64_image']!);
-                    return _buildItem(imageBytes, item['clothes_name'].toString(), item['clothes_type'].join(' '));
+                    return _buildItem(imageBytes, item['clothes_name'].toString(), item['clothes_type'].join('#'));
                   },
                 ),
               ),
@@ -276,7 +276,7 @@ Widget _buildItem(Uint8List imageBytes, String title, String subtitle) {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Text(
-            subtitle,
+            "#" + subtitle,
             style: TextStyle(color: Colors.white, fontSize: 13),
             overflow: TextOverflow.ellipsis,
           ),
@@ -407,6 +407,12 @@ class _UploadState extends State<Upload> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.1,
+          ),
+        ),
       ),
       body: Container(
         color: Colors.white,
@@ -532,7 +538,7 @@ class _UploadState extends State<Upload> {
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown,
+                    backgroundColor: Colors.black87,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

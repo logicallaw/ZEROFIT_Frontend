@@ -291,7 +291,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                     return _buildItem(
                       imageBytes,
                       item['clothes_name'].toString(),
-                      item['clothes_type'].join(' '),
+                      item['clothes_type'].join('#'),
                       index,
                     );
                   },
@@ -352,7 +352,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    subtitle,
+                    "#" + subtitle,
                     style: TextStyle(color: Colors.white, fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -459,6 +459,12 @@ class _UploadState extends State<Upload> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 0.1,
+          ),
+        ),
       ),
       body: Container(
         color: Colors.white,
@@ -519,6 +525,7 @@ class _UploadState extends State<Upload> {
                   color: isClothingTypeEmpty ? Colors.red : Colors.black,
                 ),
               ),
+              SizedBox(height: 4),
               Container(
                 padding: EdgeInsets.all(2),
                 decoration: BoxDecoration(
@@ -546,6 +553,7 @@ class _UploadState extends State<Upload> {
                   color: isRatingEmpty ? Colors.red : Colors.black,
                 ),
               ),
+              SizedBox(height: 4),
               Container(
                 padding: EdgeInsets.all(2),
                 decoration: BoxDecoration(
@@ -568,6 +576,7 @@ class _UploadState extends State<Upload> {
                 fontWeight: FontWeight.bold,
                 color: isPostNameEmpty ? Colors.red : Colors.black,
               )),
+              SizedBox(height: 4),
               Container(
                 padding: EdgeInsets.all(2),
                 decoration: BoxDecoration(
@@ -584,7 +593,7 @@ class _UploadState extends State<Upload> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
