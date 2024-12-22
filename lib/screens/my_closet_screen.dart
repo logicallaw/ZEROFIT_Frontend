@@ -96,13 +96,19 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
               labelColor: Colors.black87,
               unselectedLabelColor: Colors.white,
               tabs: [
-                Tab(text: "나의 옷장"),
+                GestureDetector(
+                  onTap: (){
+                    getClothes();
+                  },
+                  child: Tab(text: "나의 옷장"),
+                ),
                 Tab(text: "AI 피팅"),
-                Tab(text: "옷 등록"),
+                Tab(text: "옷 등록" ),
               ],
               splashFactory: NoSplash.splashFactory,
               overlayColor: MaterialStateProperty.all(Colors.transparent),
               dividerColor: Colors.transparent,
+
             ),
           ),
         ),
