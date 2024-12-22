@@ -139,8 +139,20 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               labelColor: Colors.black87,
               unselectedLabelColor: Colors.white,
               tabs: [
-                Tab(text: "의류 구매"),
-                Tab(text: "의류 판매"),
+                GestureDetector(
+                  onTap: (){
+                      getMarketClothes();
+                      _tabController.animateTo(0);
+                  },
+                      child: Tab(text: "의류 구매"),
+                ),
+                GestureDetector(
+                  onTap: (){
+                    getClothes();
+                    _tabController.animateTo(1);
+                  },
+                  child: Tab(text: "의류 판매"),
+                ),
               ],
               splashFactory: NoSplash.splashFactory,
               overlayColor: MaterialStateProperty.all(Colors.transparent),
@@ -407,7 +419,7 @@ class _UploadState extends State<Upload> {
   void _validateAndSubmit() {
     setState(() {
       // 입력 값 확인 및 상태 업데이트
-      isClothingNameEmpty = _clothingNameController.text.isEmpty;
+
       isRatingEmpty = _accountNumber.text.isEmpty;
       isClothingTypeEmpty = _price.text.isEmpty;
       if(selectedClothingStyle == null) {
@@ -416,10 +428,9 @@ class _UploadState extends State<Upload> {
       isPostNameEmpty = _postName.text.isEmpty;
     });
 
-    if (!isClothingNameEmpty && !isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty && !isPostNameEmpty) {
+    if (!isRatingEmpty && !isClothingTypeEmpty && !isClothingStyleEmpty && !isPostNameEmpty) {
 
       // 모든 필드가 입력되었을 때 동작
-      print("옷 이름: ${_clothingNameController.text}");
       print("옷 번호: ${widget.clothesId}");
       print("거래 종류: $selectedClothingStyle");
       print("거래 가격: ${_price.text}");
@@ -467,6 +478,7 @@ class _UploadState extends State<Upload> {
         ),
       ),
       body: Container(
+        height: double.infinity,
         color: Colors.white,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -487,23 +499,23 @@ class _UploadState extends State<Upload> {
                 ),
               ),
               Text(
-                '옷 이름',
+                '게시글',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isClothingNameEmpty ? Colors.red : Colors.black,
+                  color: isPostNameEmpty ? Colors.red : Colors.black,
                 ),
                 textAlign: TextAlign.left,
               ),
               TextField(
-                controller: _clothingNameController,
+                controller: _postName,
                 decoration: InputDecoration(
-                  hintText: '옷 이름을 입력하세요',
+                  hintText: '게시글을 입력해주세요',
                   hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none, // Border 제거
                 ),
               ),
-              SizedBox(height: 12),
+              SizedBox(height: 20),
               Text(
                 '거래 종류',
                 style: TextStyle(
@@ -571,29 +583,7 @@ class _UploadState extends State<Upload> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text('게시글' , style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isPostNameEmpty ? Colors.red : Colors.black,
-              )),
-              SizedBox(height: 4),
-              Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextField(
-                  maxLines: 1,
-                  controller: _postName,
-                  decoration: InputDecoration(
-                    hintText: ' 게시글을 입력해주세요',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
+              SizedBox(height: 60),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -616,6 +606,7 @@ class _UploadState extends State<Upload> {
           ),
         ),
       ),
+
     );
 
 

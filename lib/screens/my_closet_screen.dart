@@ -99,6 +99,7 @@ class _MyClosetScreenState extends State<MyClosetScreen> with SingleTickerProvid
                 GestureDetector(
                   onTap: (){
                     getClothes();
+                    _tabController.animateTo(0);
                   },
                   child: Tab(text: "나의 옷장"),
                 ),
