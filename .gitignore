@@ -1,45 +1,32 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# Flutter 관련 빌드 디렉터리
+build/
+.flutter/
 .dart_tool/
+
+# iOS 관련 파일
+ios/Pods/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+
+# Android 관련 파일
+android/.gradle/
+android/app/*.iml
+
+# Dart 패키지 캐시
+.packages
 .flutter-plugins
 .flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
 
-# Symbolication related
-app.*.symbols
+# 개인 환경 설정 파일
+.vscode/
+.idea/
+*.iml
 
-# Obfuscation related
-app.*.map.json
+# macOS 및 기타 시스템 파일
+.DS_Store
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Github 관련
+README.md8
 
-*.env
+# 환경변수
+.env
