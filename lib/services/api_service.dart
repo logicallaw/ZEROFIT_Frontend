@@ -14,16 +14,6 @@ class ApiService {
     final nodePort = dotenv.get("NODE_PORT");
     nodeUrl = 'http://$nodeHost:$nodePort';
   }
-  // GET /my-image
-  Future<String> fetchData() async {
-    final response = await http.get(Uri.parse('$nodeUrl/my-image'));
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body); // Parsing in JSON foramt
-      return data['message']; // return 'message'
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
 
   // POST /auth/join
   Future<String> signup({
@@ -58,13 +48,13 @@ class ApiService {
       if (response.statusCode == 200) {
         await _storage.write(key: 'jwt_token', value: responseBody['token']);
         print(responseBody['token']);
-        return 'Signup successful!';
+        return '회원가입이 성공적으로 되었습니다!';
       } else {
 
         return 'Successfully: ${responseBody['message']}';
       }
     } catch (e) {
-      return 'Error: Could not connect to server';
+      return '인터넷 연결을 확인해주세요.';
     }
   }
 
@@ -81,24 +71,21 @@ class ApiService {
         if (responseBody['token'] != null) {
           await _storage.write(key: 'jwt_token', value: responseBody['token']);
         }
-
-        print(responseBody);
-
         return {
           'status':true,
-          'message':'Login successful!'};
+          'message':'로그인이 되었습니다!'};
       } else {
         final responseBody = jsonDecode(response.body);
         return {
           'status': false, // 요청 성공 여부
-          'message': 'Error: ${responseBody['message']}' // 메시지
+          'message': '${responseBody['message']}' // 메시지
         };
       }
     } catch (e) {
 
       return {
         'status': false, // 요청 성공 여부
-        'message': 'Error: Could not connect to server', // 메시지
+        'message': '인터넷 연결을 확인해주세요.', // 메시지
       };
     }
   }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ma_app_zerofit/main.dart';
 import 'package:provider/provider.dart';
 import 'password_reset_screen.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ma_app_zerofit/store.dart';
 
 class AccountManagementScreen extends StatefulWidget {
