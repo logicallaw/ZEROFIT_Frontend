@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: 'Dosamarvis@gmail.com',
+                    hintText: '이메일을 입력해주세요',
                     hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen>
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    hintText: '••••••••',
+                    hintText: '비밀번호를 입력해주세요',
                     hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen>
                     );
                   },
                   child: const Text(
-                    '비밀번호가 기억이 안 나요!',
+                    '',
                     style: TextStyle(color: Colors.red, fontSize: 12),
                   ),
                 ),
@@ -247,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen>
                 TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    hintText: '신민희',
+                    hintText: '홍길동',
                     hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen>
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: 'name@email.com',
+                    hintText: 'example@example.com',
                     hintStyle: TextStyle(color:Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
